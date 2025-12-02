@@ -1,0 +1,6 @@
+﻿  bio.cpp
+C:\Users\sock2\source\repos\biohazard\biohazard\bio.cpp(1,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': 매크로 재정의
+C:\Users\sock2\source\repos\biohazard\biohazard\bio.cpp : message : '_CRT_SECURE_NO_WARNINGS'의 이전 정의를 참조하십시오.
+C:\Users\sock2\source\repos\biohazard\biohazard\bio.cpp(169,15): warning C4244: '인수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\sock2\source\repos\biohazard\biohazard\bio.cpp(232,12): warning C4101: 'dangerrate' :참조되지 않은 지역 변수입니다.
+  biohazard.vcxproj -> C:\Users\sock2\source\repos\biohazard\Debug\biohazard.exe
