@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1764656074 source:c:\4개언어 작품\biohazard\main.cpp
+	<iostream>
+	<vector>
+	<string>
+	<stdlib.h>
+	<time.h>
+	<windows.h>
+	<math.h>
+	<chrono>
+	<ctime>
+
