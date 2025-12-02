@@ -1,0 +1,269 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <vector>
+#include <string>
+#include <stdlib.h>
+#include <time.h>
+#include <windows.h>
+#include <math.h>
+#include <chrono>
+#include <ctime>
+
+#define e 2.7182818284
+
+using namespace std;
+using namespace std::chrono; // C++11
+
+auto now = system_clock::now();
+std::time_t now_c = system_clock::to_time_t(now);
+
+class Area // 지역
+{
+private:
+    string ar;
+public:
+    Area();
+    Area(string ar);
+    string getArea(void);
+};
+Area::Area()
+{
+
+}
+Area::Area(string ar)
+{
+    this->ar=ar;
+}
+string Area::getArea(void)
+{
+    return this->ar;
+}
+class FirstWeight // 방사능 초기질량
+{
+private:
+    double fw;
+public:
+    FirstWeight();
+    FirstWeight(double fw);
+    double getFirstWeight(double rfw);
+};
+FirstWeight::FirstWeight()
+{
+
+}
+FirstWeight::FirstWeight(double fw)
+{
+    this->fw=fw;
+}
+double FirstWeight::getFirstWeight(double rfw)
+{
+    this->fw+=rfw;
+    return this->fw;
+}
+class DecayRate // 붕괴율 측정
+{
+private:
+    double k;
+public:
+    DecayRate();
+    DecayRate(double k);
+    double getDecayRate(double rk);
+};
+DecayRate::DecayRate()
+{
+
+}
+DecayRate::DecayRate(double k)
+{
+    this->k=k;
+}
+double DecayRate::getDecayRate(double rk)
+{
+    this->k+=rk;
+    return this->k;
+}
+class calcYear // 표본 에측 연도 설정
+{
+private:
+    double t;
+public:
+    calcYear();
+    calcYear(double t);
+    double getcalcYear(double rt);
+};
+calcYear::calcYear()
+{
+
+}
+calcYear::calcYear(double t)
+{
+    this->t=t;
+}
+double calcYear::getcalcYear(double rt)
+{
+    this->t+=rt;
+    return this->t;
+}
+class LastWeight // 방사능 에측결과 질량(방사능 위험도)
+{
+private:
+    double lw;
+public:
+    LastWeight();
+    LastWeight(double lw);
+    double getLastWeight(double rlw);
+};
+LastWeight::LastWeight()
+{
+
+}
+LastWeight::LastWeight(double lw)
+{
+    this->lw=lw;
+}
+double LastWeight::getLastWeight(double rlw)
+{
+    this->lw+=rlw;
+    return this->lw;
+}
+class Datetime // 현재 연도 가져오기
+{
+private:
+    double tm;
+public:
+    std::tm *datelog_tm = std::localtime(&now_c);
+    Datetime();
+    Datetime(double tm);
+    double getDateTime(void);
+};
+Datetime::Datetime()
+{
+
+}
+Datetime::Datetime(double tm)
+{
+    this->tm=tm;
+}
+double Datetime::getDateTime(void)
+{
+    this->tm=(datelog_tm->tm_year)+1900;
+    return this->tm;
+}
+class SystemAPP // 지역별 방사능 위험도 시스템
+{
+private:
+    int cnt=0;
+    Area ae[100];
+    FirstWeight frwt[100];
+    DecayRate cK[100];
+    calcYear cT[100];
+    LastWeight lswt[100];
+    Datetime dtm[100];
+public:
+    void Setting(void); // 지역 / 방사능 초기 질량 / 붕괴율 / 에측연도 세팅
+    void analysisweight(void); // 방사능 에측결과 질량 구하기
+    void getDanger(void); // 에측결과에 따른 위험도 알림표시
+};
+void SystemAPP::Setting(void)
+{
+    srand(time(NULL));
+    FILE *fp1;
+    fp1=fopen("Arealist.txt","r");
+    int i;
+    int g;
+    double fw;
+    double rfw=0;
+    double k;
+    double rk=0;
+    double t;
+    double rt=0;
+    double lw=0;
+    char are[100];
+    cout<<"-----지역별 방사능 위험도 분석 프로그램-----"<<endl;
+    if (fp1 == NULL) {
+        return ;
+    }
+    while(g=fscanf(fp1,"%s\n",are)!=EOF){
+        ae[cnt++]=Area(are);
+    }
+    fclose(fp1);
+    cout<<endl;
+    t=(rand()%101+1)/10.0;
+    for(i=0;i<cnt;i++){
+        fw=(rand()%5001)/10.0;
+        k=(rand()%10001)/100.0;
+        frwt[i]=FirstWeight(fw);
+        cK[i]=DecayRate(k);
+        cT[i]=calcYear(t);
+        lswt[i]=LastWeight(lw);
+    }
+    cout<<"---------DataBase(DB)를 얻었습니다!!-------"<<endl;
+    cout<<endl;
+    cout<<"    Num.Area      N0   /  K  /  T  / Year "<<endl;
+    for(i=0;i<cnt;i++){
+        cout<<i+1<<"."<<ae[i].getArea()<<"   "<<frwt[i].getFirstWeight(rfw)<<" / "<<cK[i].getDecayRate(rk)<<" / "<<cT[i].getcalcYear(rt)<<" / "<<dtm[i].getDateTime()<<endl;
+    }
+    cout<<endl;
+    cout<<endl;
+}
+void SystemAPP::analysisweight(void)
+{
+    int i;
+    double rfw=0;
+    double rk=0;
+    double rt=0;
+    double rlw=0;
+    for(i=0;i<cnt;i++){
+        rlw=frwt[i].getFirstWeight(rfw)*pow(e,-(cK[i].getDecayRate(rk)/100)*cT[i].getcalcYear(rt));
+        lswt[i].getLastWeight(rlw);
+    }
+    cout<<"---------"<<cnt<<"개지역이 "<<"측정되었습니다.!!---------"<<endl;
+    cout<<endl;
+}
+void SystemAPP::getDanger(void)
+{
+    int i;
+    double rfw=0;
+    double rk=0;
+    double rt=0;
+    double lw=0;
+    double logd;
+    double Tyear;
+    double dangerrate;
+    cout<<"     ------------"<<endl;
+    cout<<"       "<<cnt<<"개 지역"<<endl;
+    cout<<"     ------------"<<endl;
+    for(i=0;i<cnt;i++){
+        logd=log(frwt[i].getFirstWeight(rfw)/0.00001);
+        Tyear=logd/(cK[i].getDecayRate(rk)/100);
+        cout<<"------------------------------------------------"<<endl;
+        cout<<i+1<<"."<<ae[i].getArea()<<endl;
+        cout<<"방사능 초기질량 : "<<frwt[i].getFirstWeight(rfw)<<" u"<<endl;
+        cout<<"붕괴율 : "<<cK[i].getDecayRate(rk)<<"%"<<endl;
+        cout<<"현재 연도 : "<<dtm[i].getDateTime()<<"년"<<endl;
+        cout<<"표본 예측 연도 : "<<cT[i].getcalcYear(rt)<<"년"<<endl;
+        printf("%d년 방사능 에측결과 질량 : %.6lf u\n",(int)(dtm[i].getDateTime()+cT[i].getcalcYear(rt)),lswt[i].getLastWeight(lw));
+        printf("%.1lf년후 소멸 예측 연도 : %d년\n",Tyear,(int)(dtm[i].getDateTime()+Tyear));
+        if(cK[i].getDecayRate(rk)>=100){
+           cout<<"방사능 위험도 알림 : "<<"검정(매우 위험함)"<<endl;
+        }
+        else if(cK[i].getDecayRate(rk)>=50 && cK[i].getDecayRate(rk)<100){
+            cout<<"방사능 위험도 알림 : "<<"빨강(위험함)"<<endl;
+        }
+        else if(cK[i].getDecayRate(rk)>=10 && cK[i].getDecayRate(rk)<50){
+            cout<<"방사능 위험도 알림 : "<<"노랑(보통)"<<endl;
+        }
+        else{
+            cout<<"방사능 위험도 알림 : "<<"초록(안전)"<<endl;
+        }
+        cout<<"------------------------------------------------"<<endl;
+    }
+}
+int main()
+{
+    SystemAPP sap;
+    sap.Setting();
+    sap.analysisweight();
+    sap.getDanger();
+    return 0;
+}
